@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Jacob Osborne — Marketing & Tech</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --blue-deep:   #050d2e;
+    --blue-mid:    #0a1f6e;
+    --blue-vivid:  #1a4fcc;
+    --blue-bright: #3b82f6;
+    --blue-glow:   #60a5fa;
+    --blue-pale:   #bfdbfe;
+    --white:       #ffffff;
+    --white-90:    rgba(255,255,255,0.90);
+    --white-60:    rgba(255,255,255,0.60);
+    --white-20:    rgba(255,255,255,0.12);
+    --white-10:    rgba(255,255,255,0.07);
+    --accent:      #38bdf8;
+    --accent-soft: rgba(56,189,248,0.15);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, var(--blue-deep) 0%, var(--blue-mid) 45%, #0e2f8a 75%, #1e3a8a 100%);
+    min-height: 100vh;
+    color: var(--white-90);
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 18px 60px;
+    background: rgba(5,13,46,0.75);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--white-20);
+  }
+  .nav-logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.15rem; font-weight: 800;
+    letter-spacing: 0.02em; color: var(--white);
+    text-decoration: none;
+  }
+  .nav-links { display: flex; gap: 36px; list-style: none; }
+  .nav-links a {
+    text-decoration: none; color: var(--white-60); font-size: 0.875rem;
+    font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--accent); }
+
+  /* ── SECTIONS ── */
+  section { max-width: 1000px; margin: 0 auto; padding: 100px 40px 60px; }
+  section:first-of-type { padding-top: 140px; }
+
+  /* ── HERO ── */
+  .hero { text-align: center; padding-top: 160px; padding-bottom: 80px; }
+
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 0.78rem; font-weight: 600; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--accent);
+    background: var(--accent-soft); border: 1px solid rgba(56,189,248,0.3);
+    border-radius: 100px; padding: 6px 16px; margin-bottom: 28px;
+  }
+  .dot { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2.8rem, 7vw, 5rem);
+    font-weight: 800; line-height: 1.05;
+    color: var(--white); margin-bottom: 20px;
+    letter-spacing: -0.02em;
+  }
+  .hero h1 span {
+    background: linear-gradient(90deg, var(--blue-glow), var(--accent));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    font-size: 1.15rem; color: var(--white-60); max-width: 600px;
+    margin: 0 auto 40px; font-weight: 400; line-height: 1.7;
+  }
+
+  .hero-cta { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+  .btn {
+    display: inline-block; text-decoration: none; border-radius: 8px;
+    padding: 13px 28px; font-size: 0.9rem; font-weight: 600;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .btn:hover { transform: translateY(-2px); }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--blue-vivid), var(--accent));
+    color: var(--white);
+    box-shadow: 0 4px 24px rgba(56,189,248,0.35);
+  }
+  .btn-primary:hover { box-shadow: 0 8px 32px rgba(56,189,248,0.5); }
+  .btn-secondary {
+    background: var(--white-10); color: var(--white-90);
+    border: 1px solid var(--white-20);
+  }
+  .btn-secondary:hover { background: var(--white-20); }
+
+  /* ── SECTION LABEL ── */
+  .section-label {
+    font-size: 0.72rem; font-weight: 700; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 12px;
+  }
+  .section-title {
+    font-family: 'Syne', sans-serif; font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+    font-weight: 800; color: var(--white); margin-bottom: 40px; line-height: 1.2;
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    border: none; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--white-20), transparent);
+    max-width: 1000px; margin: 0 auto;
+  }
+
+  /* ── ABOUT ── */
+  .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: start; }
+  .about-text p { color: var(--white-60); line-height: 1.8; margin-bottom: 16px; font-size: 0.975rem; }
+  .about-text p:last-child { margin-bottom: 0; }
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .stat-card {
+    background: var(--white-10); border: 1px solid var(--white-20);
+    border-radius: 12px; padding: 22px 20px;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .stat-card:hover { background: var(--white-20); border-color: rgba(56,189,248,0.3); }
+  .stat-num {
+    font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800;
+    color: var(--accent); line-height: 1; margin-bottom: 4px;
+  }
+  .stat-label { font-size: 0.8rem; color: var(--white-60); font-weight: 500; }
+
+  /* ── SKILLS ── */
+  .skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+  .skill-group {
+    background: var(--white-10); border: 1px solid var(--white-20);
+    border-radius: 12px; padding: 24px;
+    transition: border-color 0.2s;
+  }
+  .skill-group:hover { border-color: rgba(56,189,248,0.4); }
+  .skill-group h3 {
+    font-size: 0.78rem; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 14px;
+  }
+  .skill-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+  .tag {
+    background: var(--white-10); border: 1px solid var(--white-20);
+    border-radius: 6px; padding: 4px 10px; font-size: 0.78rem;
+    color: var(--white-60); font-weight: 500;
+  }
+
+  /* ── EXPERIENCE / TIMELINE ── */
+  .timeline { position: relative; padding-left: 28px; }
+  .timeline::before {
+    content: ''; position: absolute; left: 0; top: 8px; bottom: 8px;
+    width: 2px; background: linear-gradient(to bottom, var(--accent), var(--blue-vivid), transparent);
+    border-radius: 2px;
+  }
+  .timeline-item { position: relative; margin-bottom: 44px; }
+  .timeline-item:last-child { margin-bottom: 0; }
+  .timeline-dot {
+    position: absolute; left: -35px; top: 6px;
+    width: 14px; height: 14px; border-radius: 50%;
+    background: var(--accent); border: 3px solid var(--blue-deep);
+    box-shadow: 0 0 0 2px var(--accent);
+  }
+  .timeline-meta {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 8px; flex-wrap: wrap;
+  }
+  .timeline-role {
+    font-family: 'Syne', sans-serif; font-size: 1.05rem; font-weight: 700; color: var(--white);
+  }
+  .timeline-org {
+    font-size: 0.85rem; color: var(--accent); font-weight: 600;
+  }
+  .timeline-date {
+    font-size: 0.75rem; color: var(--white-60); font-weight: 500;
+    background: var(--white-10); border: 1px solid var(--white-20);
+    border-radius: 100px; padding: 3px 10px; margin-left: auto;
+  }
+  .timeline-bullets { list-style: none; }
+  .timeline-bullets li {
+    color: var(--white-60); font-size: 0.9rem; line-height: 1.7;
+    padding-left: 16px; position: relative; margin-bottom: 4px;
+  }
+  .timeline-bullets li::before {
+    content: '→'; position: absolute; left: 0; color: var(--accent); font-size: 0.8rem;
+  }
+
+  /* ── PROJECTS ── */
+  .projects-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .project-card {
+    background: var(--white-10); border: 1px solid var(--white-20);
+    border-radius: 16px; padding: 28px; position: relative; overflow: hidden;
+    transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+  }
+  .project-card::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(56,189,248,0.08) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .project-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(56,189,248,0.4);
+    box-shadow: 0 12px 40px rgba(56,189,248,0.12);
+  }
+  .project-icon { font-size: 2rem; margin-bottom: 14px; }
+  .project-card h3 {
+    font-family: 'Syne', sans-serif; font-size: 1.15rem; font-weight: 800;
+    color: var(--white); margin-bottom: 8px;
+  }
+  .project-card p { font-size: 0.875rem; color: var(--white-60); line-height: 1.7; margin-bottom: 16px; }
+  .project-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .project-tag {
+    font-size: 0.72rem; font-weight: 600; padding: 3px 9px; border-radius: 100px;
+    background: var(--accent-soft); color: var(--accent);
+    border: 1px solid rgba(56,189,248,0.25);
+  }
+
+  /* ── CERTS ── */
+  .certs-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+  .cert-card {
+    display: flex; align-items: center; gap: 14px;
+    background: var(--white-10); border: 1px solid var(--white-20);
+    border-radius: 10px; padding: 16px 18px;
+    transition: border-color 0.2s;
+  }
+  .cert-card:hover { border-color: rgba(56,189,248,0.35); }
+  .cert-icon { font-size: 1.4rem; flex-shrink: 0; }
+  .cert-name { font-size: 0.875rem; font-weight: 600; color: var(--white); line-height: 1.3; }
+  .cert-issuer { font-size: 0.75rem; color: var(--accent); font-weight: 500; margin-top: 2px; }
+
+  /* ── CONTACT ── */
+  .contact-box {
+    text-align: center;
+    background: var(--white-10); border: 1px solid var(--white-20);
+    border-radius: 20px; padding: 60px 40px;
+  }
+  .contact-box h2 {
+    font-family: 'Syne', sans-serif; font-size: clamp(1.8rem,4vw,2.8rem);
+    font-weight: 800; color: var(--white); margin-bottom: 16px;
+  }
+  .contact-box p { color: var(--white-60); margin-bottom: 36px; font-size: 1rem; }
+  .contact-links { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; }
+  .contact-link {
+    display: inline-flex; align-items: center; gap: 8px;
+    text-decoration: none; color: var(--white-90); font-size: 0.9rem; font-weight: 500;
+    background: var(--white-10); border: 1px solid var(--white-20);
+    border-radius: 8px; padding: 12px 20px;
+    transition: background 0.2s, border-color 0.2s, transform 0.15s;
+  }
+  .contact-link:hover {
+    background: var(--white-20); border-color: var(--accent);
+    transform: translateY(-2px); color: var(--accent);
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center; padding: 30px 20px;
+    font-size: 0.78rem; color: var(--white-60);
+    border-top: 1px solid var(--white-10);
+    margin-top: 40px;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 700px) {
+    nav { padding: 16px 20px; }
+    .nav-links { gap: 18px; }
+    section { padding: 80px 20px 50px; }
+    .hero { padding-top: 120px; }
+    .about-grid { grid-template-columns: 1fr; gap: 36px; }
+    .projects-grid { grid-template-columns: 1fr; }
+    .timeline-date { margin-left: 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dot { animation: none; }
+    .project-card, .btn, .contact-link { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#hero" class="nav-logo">JO</a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <div class="hero-eyebrow"><span class="dot"></span> Open to opportunities</div>
+  <h1>Jacob Osborne<br><span>Marketing meets tech.</span></h1>
+  <p class="hero-sub">BYU Information Systems student blending data-driven marketing, analytics, and a builder's mindset to drive real results — from SEO campaigns to mobile apps.</p>
+  <div class="hero-cta">
+    <a href="#contact" class="btn btn-primary">Get in touch</a>
+    <a href="#projects" class="btn btn-secondary">See my work</a>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- ABOUT -->
+<section id="about">
+  <p class="section-label">About me</p>
+  <h2 class="section-title">Analytical thinker.<br>Creative executor.</h2>
+  <div class="about-grid">
+    <div class="about-text">
+      <p>I'm a first-year Information Systems student at BYU's Marriott School of Business with a foundation in digital marketing built at Mountainland Technical College. I care about where data, design, and technology intersect — especially in AI-driven marketing and analytics.</p>
+      <p>I've spent the last few years not just studying these tools but using them: launching an apparel brand, building a mobile app, earning six industry certifications, and running live ad campaigns. I'm fluent in Portuguese and spent two years in Lisbon leading teams and working across cultures.</p>
+      <p>I'm actively looking for entry-level roles in marketing, analytics, or tech — anywhere that needs someone who can both run a campaign and dig into the numbers behind it.</p>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-num">3.92</div>
+        <div class="stat-label">GPA at BYU Marriott</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">6</div>
+        <div class="stat-label">Industry certifications</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">2 yrs</div>
+        <div class="stat-label">Abroad in Portugal</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">3+</div>
+        <div class="stat-label">Platforms & products launched</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- SKILLS -->
+<section id="skills">
+  <p class="section-label">Skills</p>
+  <h2 class="section-title">What I bring to the table.</h2>
+  <div class="skills-grid">
+    <div class="skill-group">
+      <h3>Analytics & Ads</h3>
+      <div class="skill-tags">
+        <span class="tag">Google Analytics</span>
+        <span class="tag">Google Ads</span>
+        <span class="tag">SEMrush</span>
+        <span class="tag">Search Console</span>
+        <span class="tag">Facebook Ads</span>
+      </div>
+    </div>
+    <div class="skill-group">
+      <h3>Marketing</h3>
+      <div class="skill-tags">
+        <span class="tag">SEO</span>
+        <span class="tag">Email Marketing</span>
+        <span class="tag">Content Strategy</span>
+        <span class="tag">HubSpot</span>
+        <span class="tag">Social Media</span>
+      </div>
+    </div>
+    <div class="skill-group">
+      <h3>Design & Web</h3>
+      <div class="skill-tags">
+        <span class="tag">Adobe Illustrator</span>
+        <span class="tag">Photoshop</span>
+        <span class="tag">InDesign</span>
+        <span class="tag">WordPress</span>
+        <span class="tag">Web Optimization</span>
+      </div>
+    </div>
+    <div class="skill-group">
+      <h3>Professional</h3>
+      <div class="skill-tags">
+        <span class="tag">Portuguese (Professional)</span>
+        <span class="tag">Team Leadership</span>
+        <span class="tag">Problem Solving</span>
+        <span class="tag">Presentation</span>
+        <span class="tag">Cross-cultural</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- EXPERIENCE -->
+<section id="experience">
+  <p class="section-label">Experience</p>
+  <h2 class="section-title">What I've done.</h2>
+  <div class="timeline">
+
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-meta">
+        <div>
+          <div class="timeline-role">B.S. Information Systems</div>
+          <div class="timeline-org">BYU Marriott School of Business</div>
+        </div>
+        <div class="timeline-date">Sep 2025 – May 2029</div>
+      </div>
+      <ul class="timeline-bullets">
+        <li>3.92 GPA — currently in first year, focusing on the intersection of business, data, and technology.</li>
+      </ul>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-meta">
+        <div>
+          <div class="timeline-role">Missionary & Team Lead</div>
+          <div class="timeline-org">Lisbon, Portugal</div>
+        </div>
+        <div class="timeline-date">Aug 2023 – Aug 2025</div>
+      </div>
+      <ul class="timeline-bullets">
+        <li>Led weekly cross-functional teams of up to 10 people to plan outreach and hit measurable goals.</li>
+        <li>Developed professional Portuguese fluency through 2 years of daily immersive communication.</li>
+        <li>Built discipline and adaptability managing a rigorous, self-directed schedule across a new culture.</li>
+      </ul>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-meta">
+        <div>
+          <div class="timeline-role">Digital Marketing & Analytics</div>
+          <div class="timeline-org">Mountainland Technical College</div>
+        </div>
+        <div class="timeline-date">Aug 2022 – May 2023</div>
+      </div>
+      <ul class="timeline-bullets">
+        <li>Built and ranked a personal website using on-page SEO and keyword research from scratch.</li>
+        <li>Hands-on work with Google Ads, Analytics, SEMrush, and the full Adobe Creative Suite.</li>
+        <li>Launched and sold self-created products online; earned 6 industry certifications. GPA: 4.00.</li>
+      </ul>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-meta">
+        <div>
+          <div class="timeline-role">Warehouse & Fulfillment</div>
+          <div class="timeline-org">Libertas Institute</div>
+        </div>
+        <div class="timeline-date">Sep 2021 – Jun 2022</div>
+      </div>
+      <ul class="timeline-bullets">
+        <li>Handled end-to-end fulfillment for 2 product lines — assembly, inventory, packaging, and shipping.</li>
+        <li>Consistently met tight shipping deadlines in a high-volume environment.</li>
+      </ul>
+    </div>
+
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- PROJECTS -->
+<section id="projects">
+  <p class="section-label">Projects</p>
+  <h2 class="section-title">Things I've built.</h2>
+  <div class="projects-grid">
+    <div class="project-card">
+      <div class="project-icon">🔧</div>
+      <h3>Build Bible</h3>
+      <p>A mobile app for car enthusiasts to log parts, track a build budget, and manage a full vehicle project from start to finish. Designed the UX, built core features, and drove organic growth through social media marketing.</p>
+      <div class="project-tags">
+        <span class="project-tag">Mobile App</span>
+        <span class="project-tag">Product Dev</span>
+        <span class="project-tag">UX Design</span>
+        <span class="project-tag">Social Marketing</span>
+      </div>
+    </div>
+    <div class="project-card">
+      <div class="project-icon">👕</div>
+      <h3>Cars & Crewnecks</h3>
+      <p>Founded an apparel brand featuring car-themed graphic designs. Sourced suppliers, built the online store, ran SEO and social campaigns across Instagram, Facebook, and LinkedIn, and handled all design in-house.</p>
+      <div class="project-tags">
+        <span class="project-tag">E-commerce</span>
+        <span class="project-tag">SEO</span>
+        <span class="project-tag">Graphic Design</span>
+        <span class="project-tag">Social Media</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- CERTIFICATIONS -->
+<section id="certs">
+  <p class="section-label">Certifications</p>
+  <h2 class="section-title">Credentials earned.</h2>
+  <div class="certs-grid">
+    <div class="cert-card">
+      <div class="cert-icon">🎯</div>
+      <div class="cert-info">
+        <div class="cert-name">Google Ads Display Certification</div>
+        <div class="cert-issuer">Google Digital Academy · Mar 2023</div>
+      </div>
+    </div>
+    <div class="cert-card">
+      <div class="cert-icon">🔍</div>
+      <div class="cert-info">
+        <div class="cert-name">Google Ads Search Certification</div>
+        <div class="cert-issuer">Google Digital Academy · Mar 2023</div>
+      </div>
+    </div>
+    <div class="cert-card">
+      <div class="cert-icon">📊</div>
+      <div class="cert-info">
+        <div class="cert-name">Google Analytics Certification</div>
+        <div class="cert-issuer">Google · Dec 2022</div>
+      </div>
+    </div>
+    <div class="cert-card">
+      <div class="cert-icon">📧</div>
+      <div class="cert-info">
+        <div class="cert-name">HubSpot Email Marketing Certification</div>
+        <div class="cert-issuer">HubSpot · Dec 2022</div>
+      </div>
+    </div>
+    <div class="cert-card">
+      <div class="cert-icon">⚙️</div>
+      <div class="cert-info">
+        <div class="cert-name">HubSpot Marketing Software Certification</div>
+        <div class="cert-issuer">HubSpot · Dec 2022</div>
+      </div>
+    </div>
+    <div class="cert-card">
+      <div class="cert-icon">✍️</div>
+      <div class="cert-info">
+        <div class="cert-name">HubSpot Content Marketing Certification</div>
+        <div class="cert-issuer">HubSpot · Nov 2022</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-box">
+    <h2>Let's work together.</h2>
+    <p>I'm actively looking for entry-level roles in marketing, analytics, and tech. Reach out — I'd love to talk.</p>
+    <div class="contact-links">
+      <a class="contact-link" href="mailto:jacobryanoemail@gmail.com">
+        <span>✉️</span> jacobryanoemail@gmail.com
+      </a>
+      <a class="contact-link" href="https://www.linkedin.com/in/jacobosborne8" target="_blank" rel="noopener">
+        <span>💼</span> LinkedIn
+      </a>
+      <a class="contact-link" href="tel:8018740020">
+        <span>📱</span> 801-874-0020
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  © 2026 Jacob Osborne · Built to impress.
+</footer>
+
+</body>
+</html>
