@@ -3,549 +3,1069 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NEON PURSUIT</title>
+<title>COP CHASE - Arcade</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --bg:#0a0420;
-    --grid:#1b0b3a;
-    --wall:#2d1b69;
-    --wall-glow:#ff2bd6;
-    --road:#06030f;
-    --player:#ff5c00;
-    --player-glow:#ffb000;
-    --dot:#2de2ff;
-    --power:#fff04d;
-    --p1:#ff2d6f;
-    --p2:#2de2ff;
-    --p3:#b14dff;
-    --p4:#ff8a3d;
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #111;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    font-family: 'Press Start 2P', monospace;
+    background: radial-gradient(ellipse at center, #1a1a1a 0%, #050505 100%);
   }
-  *{box-sizing:border-box;margin:0;padding:0;}
-  html,body{height:100%;}
-  body{
-    background:
-      radial-gradient(circle at 50% -10%, #2a0a4a 0%, var(--bg) 55%, #050210 100%);
-    font-family:'Courier New',monospace;
-    color:#fff;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    min-height:100vh;
-    gap:14px;
-    overflow:hidden;
-    padding:16px;
+
+  .cabinet {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: linear-gradient(180deg, #2a1f0e 0%, #1a1208 40%, #0f0c05 100%);
+    border-radius: 18px 18px 8px 8px;
+    padding: 20px 28px 28px;
+    box-shadow:
+      0 0 0 3px #8B6914,
+      0 0 0 6px #4a3508,
+      0 20px 60px rgba(0,0,0,0.9),
+      inset 0 1px 0 rgba(255,200,80,0.15);
+    position: relative;
+    max-width: 600px;
+    width: 100%;
   }
-  /* horizon sun glow at the bottom */
-  body::after{
-    content:"";
-    position:fixed;
-    bottom:-40vh; left:50%;
-    width:120vw; height:80vh;
-    transform:translateX(-50%);
-    background:radial-gradient(ellipse at center top, rgba(255,43,214,.18), transparent 60%);
-    pointer-events:none;
-    z-index:0;
+
+  .marquee {
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a0a00 50%, #0a0a0a 100%);
+    border: 2px solid #FFB000;
+    border-radius: 8px 8px 0 0;
+    padding: 10px 24px 8px;
+    margin-bottom: 12px;
+    text-align: center;
+    box-shadow: 0 0 20px rgba(255,176,0,0.3), inset 0 0 20px rgba(255,176,0,0.05);
+    width: 100%;
   }
-  .title{
-    position:relative; z-index:2;
-    font-size:clamp(26px,6vw,52px);
-    font-weight:bold;
-    letter-spacing:.18em;
-    background:linear-gradient(180deg,#fff 0%,#ff2bd6 55%,#7a18ff 100%);
-    -webkit-background-clip:text; background-clip:text;
-    -webkit-text-fill-color:transparent;
-    text-shadow:0 0 24px rgba(255,43,214,.5);
-    text-align:center;
+
+  .marquee h1 {
+    font-size: 22px;
+    color: #FFB000;
+    text-shadow: 0 0 10px #FFB000, 0 0 20px #FF8800, 0 0 40px #FF6600;
+    letter-spacing: 4px;
+    animation: flicker 4s infinite;
   }
-  .hud{
-    position:relative; z-index:2;
-    display:flex; gap:28px; align-items:center;
-    font-size:14px; letter-spacing:.15em;
-    text-transform:uppercase;
+
+  .marquee .sub {
+    font-size: 7px;
+    color: #FF4444;
+    letter-spacing: 2px;
+    margin-top: 5px;
+    text-shadow: 0 0 8px #FF2222;
   }
-  .hud b{color:var(--p2);font-weight:bold;text-shadow:0 0 10px var(--p2);}
-  .hud .lives b{color:var(--player);text-shadow:0 0 10px var(--player);}
-  .stage{
-    position:relative; z-index:2;
-    border-radius:8px;
-    padding:8px;
-    background:rgba(10,4,32,.6);
-    box-shadow:0 0 0 1px rgba(255,43,214,.35), 0 0 40px rgba(122,24,255,.4);
+
+  @keyframes flicker {
+    0%,95%,100% { opacity: 1; }
+    96% { opacity: 0.8; }
+    97% { opacity: 1; }
+    98% { opacity: 0.6; }
+    99% { opacity: 1; }
   }
-  canvas{display:block;border-radius:4px;}
-  .msg{
-    position:absolute; inset:8px;
-    display:none;
-    align-items:center; justify-content:center;
-    flex-direction:column; gap:14px;
-    background:rgba(5,2,16,.82);
-    border-radius:4px;
-    text-align:center;
-    backdrop-filter:blur(2px);
+
+  .screen-bezel {
+    background: #0a0a0a;
+    border-radius: 12px;
+    padding: 16px;
+    border: 3px solid #333;
+    box-shadow:
+      inset 0 0 30px rgba(0,0,0,0.8),
+      0 0 0 2px #555,
+      0 0 20px rgba(0,255,65,0.1);
+    position: relative;
+    width: 100%;
   }
-  .msg.show{display:flex;}
-  .msg h2{
-    font-size:clamp(24px,7vw,46px); letter-spacing:.1em;
-    background:linear-gradient(180deg,#fff,#2de2ff);
-    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
-    text-shadow:0 0 24px rgba(45,226,255,.5);
+
+  .screen-inner {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #000;
   }
-  .msg.lose h2{
-    background:linear-gradient(180deg,#fff,#ff2d6f);
-    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
-    text-shadow:0 0 24px rgba(255,45,111,.5);
+
+  canvas {
+    display: block;
+    width: 100%;
+    image-rendering: pixelated;
+    border-radius: 6px;
   }
-  .btn{
-    font-family:inherit; cursor:pointer;
-    padding:12px 26px; font-size:15px; letter-spacing:.18em; text-transform:uppercase;
-    color:#fff; background:transparent;
-    border:1px solid var(--wall-glow); border-radius:4px;
-    box-shadow:0 0 16px rgba(255,43,214,.5), inset 0 0 16px rgba(255,43,214,.18);
-    transition:transform .1s ease, box-shadow .2s ease;
+
+  /* CRT scanline overlay */
+  .screen-inner::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.18) 2px,
+      rgba(0,0,0,0.18) 4px
+    );
+    pointer-events: none;
+    border-radius: 6px;
+    z-index: 10;
   }
-  .btn:hover{transform:translateY(-2px);box-shadow:0 0 26px rgba(255,43,214,.8), inset 0 0 22px rgba(255,43,214,.3);}
-  .hint{position:relative;z-index:2;font-size:11px;letter-spacing:.2em;color:#7a6ab0;text-transform:uppercase;}
+
+  /* CRT phosphor glow */
+  .screen-inner::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.4) 100%);
+    pointer-events: none;
+    border-radius: 6px;
+    z-index: 11;
+  }
+
+  .controls-panel {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 18px;
+    padding: 0 8px;
+    gap: 12px;
+  }
+
+  .speaker-grills {
+    display: flex;
+    gap: 6px;
+  }
+
+  .speaker-col {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .speaker-hole {
+    width: 4px;
+    height: 20px;
+    background: #0a0a0a;
+    border-radius: 2px;
+    box-shadow: inset 0 0 3px rgba(0,0,0,0.8);
+  }
+
+  .center-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 10px;
+  }
+
+  .arcade-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    font-size: 8px;
+    font-family: 'Press Start 2P', monospace;
+    box-shadow:
+      0 4px 0 rgba(0,0,0,0.5),
+      0 0 10px rgba(255,176,0,0.2);
+    transition: transform 0.1s, box-shadow 0.1s;
+    position: relative;
+    top: 0;
+  }
+
+  .arcade-btn:active {
+    top: 3px;
+    box-shadow: 0 1px 0 rgba(0,0,0,0.5);
+  }
+
+  .btn-red { background: radial-gradient(circle at 35% 35%, #FF6666, #CC0000); color: #fff; }
+  .btn-yellow { background: radial-gradient(circle at 35% 35%, #FFE066, #CC8800); color: #333; }
+  .btn-label {
+    font-size: 5px;
+    color: #888;
+    text-align: center;
+    margin-top: 2px;
+  }
+
+  .coin-slot {
+    background: #0a0a0a;
+    width: 30px;
+    height: 6px;
+    border-radius: 3px;
+    border: 1px solid #555;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.8);
+  }
+
+  .coin-label {
+    font-size: 5px;
+    color: #666;
+    margin-top: 3px;
+  }
+
+  .instructions {
+    font-size: 6px;
+    color: #555;
+    text-align: center;
+    margin-top: 12px;
+    line-height: 1.8;
+  }
 </style>
 </head>
 <body>
-  <div class="title">Neon Pursuit</div>
-  <div class="hud">
-    <div>Score <b id="score">0</b></div>
-    <div>High <b id="high">0</b></div>
-    <div class="lives">Cars <b id="lives">●●●</b></div>
+
+<div class="cabinet">
+  <div class="marquee">
+    <h1>★ COP CHASE ★</h1>
+    <div class="sub">INSERT COIN TO PLAY — © 1987 TURBO ARCADE INC.</div>
   </div>
 
-  <div class="stage">
-    <canvas id="game"></canvas>
-    <div class="msg" id="msg">
-      <h2 id="msgTitle">Neon Pursuit</h2>
-      <p id="msgText" style="letter-spacing:.12em;color:#c9b8ff;font-size:13px;max-width:340px;line-height:1.6;"></p>
-      <button class="btn" id="startBtn">Start Engine</button>
+  <div class="screen-bezel">
+    <div class="screen-inner">
+      <canvas id="gameCanvas" width="560" height="560"></canvas>
     </div>
   </div>
-  <div class="hint">Arrows / WASD to drive · Grab the boost to chase them down</div>
+
+  <div class="controls-panel">
+    <div class="speaker-grills">
+      <div class="speaker-col">
+        <div class="speaker-hole"></div><div class="speaker-hole"></div>
+        <div class="speaker-hole"></div><div class="speaker-hole"></div>
+      </div>
+      <div class="speaker-col">
+        <div class="speaker-hole"></div><div class="speaker-hole"></div>
+        <div class="speaker-hole"></div><div class="speaker-hole"></div>
+      </div>
+      <div class="speaker-col">
+        <div class="speaker-hole"></div><div class="speaker-hole"></div>
+        <div class="speaker-hole"></div><div class="speaker-hole"></div>
+      </div>
+    </div>
+
+    <div class="center-controls">
+      <div class="btn-row">
+        <div style="text-align:center">
+          <button class="arcade-btn btn-red" onclick="startGame()">▶</button>
+          <div class="btn-label">START</div>
+        </div>
+        <div style="text-align:center">
+          <button class="arcade-btn btn-yellow" onclick="pauseGame()">II</button>
+          <div class="btn-label">PAUSE</div>
+        </div>
+      </div>
+      <div class="coin-slot"></div>
+      <div class="coin-label">◄ INSERT COIN ►</div>
+    </div>
+
+    <div class="speaker-grills">
+      <div class="speaker-col">
+        <div class="speaker-hole"></div><div class="speaker-hole"></div>
+        <div class="speaker-hole"></div><div class="speaker-hole"></div>
+      </div>
+      <div class="speaker-col">
+        <div class="speaker-hole"></div><div class="speaker-hole"></div>
+        <div class="speaker-hole"></div><div class="speaker-hole"></div>
+      </div>
+      <div class="speaker-col">
+        <div class="speaker-hole"></div><div class="speaker-hole"></div>
+        <div class="speaker-hole"></div><div class="speaker-hole"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="instructions">ARROW KEYS / WASD TO DRIVE &nbsp;|&nbsp; COLLECT ALL FUEL CANS &nbsp;|&nbsp; AVOID THE POLICE!</div>
+</div>
 
 <script>
-const TILE = 24;
-// Map legend: # wall, . dot, o power-pellet/boost, space empty road,
-// P player spawn, - police gate/door
-const MAP = [
-"############################",
-"#............##............#",
-"#.####.#####.##.#####.####.#",
-"#o####.#####.##.#####.####o#",
-"#.####.#####.##.#####.####.#",
-"#..........................#",
-"#.####.##.########.##.####.#",
-"#.####.##.########.##.####.#",
-"#......##....##....##......#",
-"######.##### ## #####.######",
-"######.##### ## #####.######",
-"######.##          ##.######",
-"######.## ###--### ##.######",
-"######.## #      # ##.######",
-"      .   #      #   .      ",
-"######.## #      # ##.######",
-"######.## ######## ##.######",
-"######.##          ##.######",
-"######.## ######## ##.######",
-"######.## ######## ##.######",
-"#............##............#",
-"#.####.#####.##.#####.####.#",
-"#.####.#####.##.#####.####.#",
-"#o..##.......P .......##..o#",
-"###.##.##.########.##.##.###",
-"###.##.##.########.##.##.###",
-"#......##....##....##......#",
-"#.##########.##.##########.#",
-"#.##########.##.##########.#",
-"#..........................#",
-"############################"
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+const CELL = 28;
+const COLS = 20;
+const ROWS = 20;
+const W = COLS * CELL;
+const H = ROWS * CELL;
+
+// Maze: 0=path, 1=wall, 2=fuel(dot), 3=powerup(energizer), 4=empty
+const MAZE_TEMPLATE = [
+  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+  [1,2,2,2,2,2,2,2,2,1,1,2,2,2,2,2,2,2,2,1],
+  [1,3,1,1,2,1,1,1,2,1,1,2,1,1,1,2,1,1,3,1],
+  [1,2,1,1,2,1,1,1,2,1,1,2,1,1,1,2,1,1,2,1],
+  [1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1],
+  [1,2,1,1,2,1,2,1,1,1,1,1,1,2,1,2,1,1,2,1],
+  [1,2,2,2,2,1,2,2,2,1,1,2,2,2,1,2,2,2,2,1],
+  [1,1,1,1,2,1,1,1,0,0,0,0,1,1,1,2,1,1,1,1],
+  [0,0,0,1,2,1,0,0,0,0,0,0,0,0,1,2,1,0,0,0],
+  [1,1,1,1,2,1,0,1,1,4,4,1,1,0,1,2,1,1,1,1],
+  [0,0,0,0,2,0,0,1,4,4,4,4,1,0,0,2,0,0,0,0],
+  [1,1,1,1,2,1,0,1,1,1,1,1,1,0,1,2,1,1,1,1],
+  [0,0,0,1,2,1,0,0,0,0,0,0,0,0,1,2,1,0,0,0],
+  [1,1,1,1,2,1,0,1,1,1,1,1,1,0,1,2,1,1,1,1],
+  [1,2,2,2,2,2,2,2,2,1,1,2,2,2,2,2,2,2,2,1],
+  [1,2,1,1,2,1,1,1,2,1,1,2,1,1,1,2,1,1,2,1],
+  [1,3,2,1,2,2,2,2,2,2,2,2,2,2,2,2,1,2,3,1],
+  [1,1,2,1,2,1,2,1,1,1,1,1,1,2,1,2,1,2,1,1],
+  [1,2,2,2,2,2,2,2,2,1,1,2,2,2,2,2,2,2,2,1],
+  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
 ];
 
-const ROWS = MAP.length;
-const COLS = MAP[0].length;
+let maze, score, lives, level, gameState, paused;
+let player, cops;
+let animFrame, lastTime, dotCount;
+let powerMode = false, powerTimer = 0;
+let titleBlink = true, blinkTimer = 0;
 
-const canvas = document.getElementById('game');
-const ctx = canvas.getContext('2d');
-canvas.width = COLS * TILE;
-canvas.height = ROWS * TILE;
-
-const scoreEl = document.getElementById('score');
-const highEl = document.getElementById('high');
-const livesEl = document.getElementById('lives');
-const msg = document.getElementById('msg');
-const msgTitle = document.getElementById('msgTitle');
-const msgText = document.getElementById('msgText');
-const startBtn = document.getElementById('startBtn');
-
-let grid, dotsLeft, score, lives, highScore, state, frame, powerTimer;
-highScore = Number(localStorage.getItem('neon-high')||0); // safe inside try below
-try { highScore = Number(localStorage.getItem('neon-high')||0); } catch(e){ highScore = 0; }
-highEl.textContent = highScore;
-
-const POLICE_COLORS = ['--p1','--p2','--p3','--p4'];
-
-let player, police;
-
-function cssVar(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
-
-function buildGrid(){
-  grid = [];
-  dotsLeft = 0;
-  for(let r=0;r<ROWS;r++){
-    grid[r]=[];
-    for(let c=0;c<COLS;c++){
-      const ch = MAP[r][c];
-      let cell = {wall:false, dot:false, power:false, gate:false};
-      if(ch==='#') cell.wall=true;
-      else if(ch==='.'){cell.dot=true; dotsLeft++;}
-      else if(ch==='o'){cell.power=true; dotsLeft++;}
-      else if(ch==='-'){cell.gate=true;}
-      grid[r][c]=cell;
-    }
-  }
+// AudioContext for retro sounds
+let audioCtx;
+function getAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
 }
 
-function findChar(target){
-  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) if(MAP[r][c]===target) return {r,c};
-  return {r:1,c:1};
+function beep(freq, dur, type='square', vol=0.08) {
+  try {
+    const ac = getAudio();
+    const o = ac.createOscillator();
+    const g = ac.createGain();
+    o.connect(g); g.connect(ac.destination);
+    o.type = type; o.frequency.value = freq;
+    g.gain.setValueAtTime(vol, ac.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + dur);
+    o.start(); o.stop(ac.currentTime + dur);
+  } catch(e) {}
 }
 
-function resetEntities(){
-  const p = findChar('P');
+function playDot() { beep(800, 0.05, 'square', 0.05); }
+function playPower() { beep(200, 0.3, 'sawtooth', 0.1); beep(400, 0.2, 'sawtooth', 0.08); }
+function playDeath() {
+  [440,392,349,330,294,262,220].forEach((f,i)=>setTimeout(()=>beep(f,0.15,'square',0.1),i*80));
+}
+function playWin() {
+  [262,330,392,523,659,784].forEach((f,i)=>setTimeout(()=>beep(f,0.12,'square',0.12),i*80));
+}
+function playSiren() {
+  if (Math.random() < 0.08) beep(powerMode ? 600 : 880, 0.1, 'square', 0.04);
+}
+
+function initGame() {
+  maze = MAZE_TEMPLATE.map(r => [...r]);
+  score = 0;
+  lives = 3;
+  level = 1;
+  paused = false;
+  dotCount = 0;
+  maze.forEach(row => row.forEach(c => { if(c===2||c===3) dotCount++; }));
+  spawnEntities();
+  gameState = 'playing';
+}
+
+function spawnEntities() {
   player = {
-    x:p.c, y:p.r, px:p.c, py:p.r,
-    dir:{x:0,y:0}, want:{x:0,y:0},
-    speed:0.12, mouth:0
+    x: 10, y: 14,
+    dx: 0, dy: 0,
+    nextDx: 0, nextDy: 0,
+    animTimer: 0,
+    frame: 0,
+    dead: false,
+    deadTimer: 0,
   };
-  // police start near the central pen
-  const homes=[{x:12,y:13},{x:15,y:13},{x:12,y:16},{x:15,y:16}];
-  police = homes.map((h,i)=>({
-    x:h.x, y:h.y, px:h.x, py:h.y,
-    dir:{x:0,y:-1},
-    speed:0.085 + i*0.004,
-    color:cssVar(POLICE_COLORS[i]),
-    frightened:false, eaten:false,
-    home:h, release:i*45+30, timer:0
+  const copColors = ['#FF2222','#2222FF','#FF22FF','#22FFFF'];
+  const copStarts = [{x:9,y:9},{x:10,y:9},{x:9,y:10},{x:10,y:10}];
+  // Stagger starting moveTimers so cops leave the pen at different times
+  const startOffsets = [0, 30, 55, 80];
+  cops = copStarts.map((pos,i) => ({
+    x: pos.x, y: pos.y,
+    dx: [1,-1,1,-1][i], dy: 0,
+    color: copColors[i],
+    scared: false,
+    scaredBlink: false,
+    moveTimer: startOffsets[i], // staggered release
+    frame: 0,
+    personality: i, // 0=chaser,1=ambusher,2=flanker,3=roamer
+    roamTarget: null,
   }));
+  powerMode = false;
+  powerTimer = 0;
 }
 
-function startGame(){
-  buildGrid();
-  score=0; lives=3; powerTimer=0; frame=0;
-  resetEntities();
-  updateHud();
-  state='play';
-  msg.classList.remove('show','lose');
-}
-
-function updateHud(){
-  scoreEl.textContent=score;
-  highEl.textContent=highScore;
-  livesEl.textContent='●'.repeat(Math.max(0,lives)) || '—';
-}
-
-function tileAt(x,y){
-  let r=Math.round(y), c=Math.round(x);
-  // tunnel wrap
-  if(c<0) c=COLS-1; if(c>=COLS) c=0;
-  if(r<0||r>=ROWS) return {wall:true,gate:false};
-  return grid[r][c];
-}
-
-function canMove(x,y,allowGate){
-  let c=Math.round(x), r=Math.round(y);
-  if(c<0||c>=COLS) return true; // tunnel
-  if(r<0||r>=ROWS) return false;
-  const cell=grid[r][c];
-  if(cell.wall) return false;
-  if(cell.gate && !allowGate) return false;
-  return true;
-}
-
-const keymap={
-  ArrowUp:[0,-1],ArrowDown:[0,1],ArrowLeft:[-1,0],ArrowRight:[1,0],
-  w:[0,-1],s:[0,1],a:[-1,0],d:[1,0],W:[0,-1],S:[0,1],A:[-1,0],D:[1,0]
-};
-addEventListener('keydown',e=>{
-  if(keymap[e.key]){
-    e.preventDefault();
-    player.want={x:keymap[e.key][0],y:keymap[e.key][1]};
-  }
-});
-
-function aligned(e){ return Math.abs(e.x-Math.round(e.x))<0.06 && Math.abs(e.y-Math.round(e.y))<0.06; }
-
-function moveEntity(e, allowGate){
-  if(aligned(e)){
-    e.x=Math.round(e.x); e.y=Math.round(e.y);
-    // player: try desired direction
-    if(e===player && (player.want.x||player.want.y)){
-      if(canMove(e.x+player.want.x, e.y+player.want.y, allowGate)){
-        e.dir={...player.want};
-      }
-    }
-    if(!canMove(e.x+e.dir.x, e.y+e.dir.y, allowGate)){
-      if(e===player){ e.dir={x:0,y:0}; }
-    }
-  }
-  e.x += e.dir.x*e.speed;
-  e.y += e.dir.y*e.speed;
-  // tunnel wrap
-  if(e.x< -0.5) e.x=COLS-0.5;
-  if(e.x> COLS-0.5) e.x=-0.5;
-}
-
-function policeAI(e){
-  if(!aligned(e)) return;
-  e.x=Math.round(e.x); e.y=Math.round(e.y);
-  const allowGate = e.eaten || (e.atHome);
-  // choose direction toward target, avoiding reversing unless dead end
-  const opts=[[1,0],[-1,0],[0,1],[0,-1]].filter(([dx,dy])=>{
-    if(dx===-e.dir.x && dy===-e.dir.y) return false; // no reverse
-    return canMove(e.x+dx,e.y+dy, e.eaten);
+function resetPositions() {
+  player.x = 10; player.y = 14;
+  player.dx = 0; player.dy = 0;
+  player.nextDx = 0; player.nextDy = 0;
+  player.dead = false;
+  player.deadTimer = 0;
+  const copStarts = [{x:9,y:9},{x:10,y:9},{x:9,y:10},{x:10,y:10}];
+  cops.forEach((cop, i) => {
+    cop.x = copStarts[i].x;
+    cop.y = copStarts[i].y;
+    cop.dx = 1; cop.dy = 0;
+    cop.moveTimer = 0;
+    cop.scared = false;
+    cop.scaredBlink = false;
   });
-  let choices = opts.length?opts:[[-e.dir.x,-e.dir.y]];
+  powerMode = false;
+  powerTimer = 0;
+}
 
-  let target;
-  if(e.eaten){ target={x:e.home.x,y:e.home.y}; }
-  else if(e.frightened){
-    // run away: pick farthest
-    choices.sort(()=>Math.random()-0.5);
-    target=null;
-  } else {
-    target={x:player.x + player.dir.x*2, y:player.y + player.dir.y*2};
+function isWalkable(x, y) {
+  if (x < 0 || x >= COLS || y < 0 || y >= ROWS) {
+    // tunnel
+    return true;
+  }
+  const c = maze[y][x];
+  return c !== 1;
+}
+
+function wrapX(x) {
+  if (x < 0) return COLS - 1;
+  if (x >= COLS) return 0;
+  return x;
+}
+
+function movePlayer() {
+  // try next direction
+  if (isWalkable(wrapX(player.x + player.nextDx), player.y + player.nextDy)) {
+    player.dx = player.nextDx;
+    player.dy = player.nextDy;
+  }
+  const nx = wrapX(player.x + player.dx);
+  const ny = player.y + player.dy;
+  if (isWalkable(nx, ny < 0 ? 0 : ny >= ROWS ? ROWS-1 : ny)) {
+    player.x = nx;
+    player.y = (ny < 0 ? 0 : ny >= ROWS ? ROWS-1 : ny);
   }
 
-  if(target){
-    choices.sort((A,B)=>{
-      const da=(e.x+A[0]-target.x)**2+(e.y+A[1]-target.y)**2;
-      const db=(e.x+B[0]-target.x)**2+(e.y+B[1]-target.y)**2;
-      return da-db;
-    });
-  }
-  const pick=choices[0];
-  e.dir={x:pick[0],y:pick[1]};
-
-  if(e.eaten && Math.abs(e.x-e.home.x)<0.6 && Math.abs(e.y-e.home.y)<0.6){
-    e.eaten=false; e.frightened=false;
+  // eat
+  const cell = maze[player.y]?.[player.x];
+  if (cell === 2) {
+    maze[player.y][player.x] = 0;
+    score += 10;
+    dotCount--;
+    playDot();
+    if (dotCount <= 0) { gameState = 'win'; playWin(); }
+  } else if (cell === 3) {
+    maze[player.y][player.x] = 0;
+    score += 50;
+    dotCount--;
+    powerMode = true;
+    powerTimer = 300;
+    cops.forEach(c => { c.scared = true; c.scaredBlink = false; });
+    playPower();
+    if (dotCount <= 0) { gameState = 'win'; playWin(); }
   }
 }
 
-function eatStuff(){
-  const c=Math.round(player.x), r=Math.round(player.y);
-  if(r<0||r>=ROWS||c<0||c>=COLS) return;
-  const cell=grid[r][c];
-  if(cell.dot){ cell.dot=false; dotsLeft--; score+=10; updateHud(); }
-  if(cell.power){
-    cell.power=false; dotsLeft--; score+=50; powerTimer=400;
-    police.forEach(p=>{ if(!p.eaten) p.frightened=true; });
-    updateHud();
+// Each cop has a personality: 0=chaser, 1=ambusher, 2=flanker, 3=random
+function copTarget(cop) {
+  if (powerMode) {
+    // Scared: flee to opposite corner based on personality
+    const corners = [
+      {x:1, y:1}, {x:COLS-2, y:1}, {x:1, y:ROWS-2}, {x:COLS-2, y:ROWS-2}
+    ];
+    return corners[cop.personality];
   }
-  if(dotsLeft<=0){ win(); }
+  switch(cop.personality) {
+    case 0: // Chaser — heads straight for player
+      return {x: player.x, y: player.y};
+    case 1: // Ambusher — targets 4 tiles ahead of player
+      return {x: Math.max(0,Math.min(COLS-1, player.x + player.dx*4)),
+              y: Math.max(0,Math.min(ROWS-1, player.y + player.dy*4))};
+    case 2: // Flanker — targets midpoint between chaser and player
+      const chaser = cops[0];
+      return {x: Math.floor((chaser.x + player.x*2)/3),
+              y: Math.floor((chaser.y + player.y*2)/3)};
+    case 3: // Roamer — wanders pseudo-randomly, only chases when close
+      const dist = Math.abs(cop.x - player.x) + Math.abs(cop.y - player.y);
+      if (dist < 6) return {x: player.x, y: player.y};
+      // drift toward a wandering target that shifts periodically
+      return cop.roamTarget || {x: player.x, y: player.y};
+  }
+  return {x: player.x, y: player.y};
 }
 
-function checkCollisions(){
-  police.forEach(p=>{
-    const d=Math.hypot(p.x-player.x, p.y-player.y);
-    if(d<0.6){
-      if(p.frightened && !p.eaten){
-        p.eaten=true; p.frightened=false; score+=200; updateHud();
-      } else if(!p.eaten){
-        loseLife();
-      }
+function copDir(cop) {
+  const target = copTarget(cop);
+  const dirs = [{dx:1,dy:0},{dx:-1,dy:0},{dx:0,dy:1},{dx:0,dy:-1}];
+  // Shuffle dirs slightly based on cop personality to break ties differently
+  if (cop.personality % 2 === 1) dirs.reverse();
+  let best = null, bestDist = Infinity;
+  dirs.forEach(d => {
+    if (d.dx === -cop.dx && d.dy === -cop.dy) return; // no 180-turns
+    const nx = wrapX(cop.x + d.dx);
+    const ny = cop.y + d.dy;
+    if (isWalkable(nx, ny)) {
+      const dist = Math.abs(nx - target.x) + Math.abs(ny - target.y);
+      if (dist < bestDist) { bestDist = dist; best = d; }
     }
   });
+  if (!best) {
+    for (const d of dirs) {
+      const nx = wrapX(cop.x + d.dx);
+      const ny = cop.y + d.dy;
+      if (isWalkable(nx, ny)) { best = d; break; }
+    }
+  }
+  return best || {dx:0, dy:0};
 }
 
-function loseLife(){
-  lives--; updateHud();
-  if(lives<=0){ gameOver(); return; }
-  // brief reset
-  const p=findChar('P');
-  player.x=p.c; player.y=p.r; player.dir={x:0,y:0}; player.want={x:0,y:0};
-  police.forEach((pl,i)=>{
-    pl.x=pl.home.x; pl.y=pl.home.y; pl.dir={x:0,y:-1};
-    pl.frightened=false; pl.eaten=false; pl.timer=0; pl.release=i*30+20;
+function moveCops() {
+  // Each cop has a distinct base speed so they desync naturally
+  const baseSpeeds = [10, 13, 11, 15]; // ticks between moves (higher = slower)
+  cops.forEach((cop, i) => {
+    const speed = powerMode ? 14 : Math.max(7, baseSpeeds[i] - (level - 1));
+    cop.moveTimer++;
+    if (cop.moveTimer >= speed) {
+      cop.moveTimer = 0;
+      // Roamer: occasionally pick a new wander target
+      if (cop.personality === 3 && Math.random() < 0.15) {
+        const walkables = [];
+        for (let r=1;r<ROWS-1;r++) for (let c=1;c<COLS-1;c++) {
+          if (maze[r][c] !== 1) walkables.push({x:c,y:r});
+        }
+        cop.roamTarget = walkables[Math.floor(Math.random()*walkables.length)];
+      }
+      const d = copDir(cop);
+      cop.dx = d.dx; cop.dy = d.dy;
+      cop.x = wrapX(cop.x + cop.dx);
+      const ny = cop.y + cop.dy;
+      cop.y = Math.max(0, Math.min(ROWS-1, ny));
+      cop.frame = (cop.frame + 1) % 2;
+    }
+    cop.scared = powerMode;
+    if (powerMode && powerTimer < 80) cop.scaredBlink = Math.floor(powerTimer/10)%2===0;
+    else cop.scaredBlink = false;
   });
-  powerTimer=0;
-  state='pause'; setTimeout(()=>{ if(state==='pause') state='play'; },800);
 }
 
-function win(){
-  state='over';
-  saveHigh();
-  msg.classList.remove('lose'); msg.classList.add('show');
-  msgTitle.textContent='You Escaped';
-  msgText.textContent='Outran every cruiser on the grid. Score '+score+'.';
-  startBtn.textContent='Drive Again';
-}
-function gameOver(){
-  state='over';
-  saveHigh();
-  msg.classList.add('show','lose');
-  msgTitle.textContent='Busted';
-  msgText.textContent='The police boxed you in. Final score '+score+'.';
-  startBtn.textContent='Retry';
-}
-function saveHigh(){
-  if(score>highScore){ highScore=score; try{localStorage.setItem('neon-high',highScore);}catch(e){} }
-  updateHud();
-}
-
-/* ---------- RENDERING ---------- */
-function drawMaze(){
-  ctx.fillStyle=cssVar('--road');
-  ctx.fillRect(0,0,canvas.width,canvas.height);
-
-  // faint synth grid floor
-  ctx.strokeStyle='rgba(122,24,255,0.08)';
-  ctx.lineWidth=1;
-  for(let x=0;x<=COLS;x++){ctx.beginPath();ctx.moveTo(x*TILE,0);ctx.lineTo(x*TILE,canvas.height);ctx.stroke();}
-  for(let y=0;y<=ROWS;y++){ctx.beginPath();ctx.moveTo(0,y*TILE);ctx.lineTo(canvas.width,y*TILE);ctx.stroke();}
-
-  const wall=cssVar('--wall-glow');
-  for(let r=0;r<ROWS;r++){
-    for(let c=0;c<COLS;c++){
-      const cell=grid[r][c];
-      const x=c*TILE, y=r*TILE;
-      if(cell.wall){
-        ctx.save();
-        ctx.shadowColor=wall; ctx.shadowBlur=10;
-        ctx.strokeStyle=wall; ctx.lineWidth=2.5;
-        ctx.strokeRect(x+4,y+4,TILE-8,TILE-8);
-        ctx.shadowBlur=0;
-        ctx.strokeStyle='rgba(45,226,255,0.35)';
-        ctx.lineWidth=1;
-        ctx.strokeRect(x+4,y+4,TILE-8,TILE-8);
-        ctx.restore();
+function checkCollisions() {
+  if (gameState !== 'playing') return;
+  cops.forEach((cop, i) => {
+    if (cop.x === player.x && cop.y === player.y) {
+      if (powerMode && cop.scared) {
+        // eat cop — send back to pen
+        score += 200;
+        beep(1200, 0.2, 'square', 0.12);
+        cop.x = 9 + (i % 2); cop.y = 9 + Math.floor(i/2);
+        cop.scared = false;
+      } else {
+        // caught! lock input immediately by switching state
+        player.dead = true;
+        player.deadTimer = 100;
+        gameState = 'dead';
+        playDeath();
       }
-      if(cell.gate){
-        ctx.strokeStyle='rgba(45,226,255,0.7)';
-        ctx.lineWidth=3;
-        ctx.beginPath();ctx.moveTo(x+2,y+TILE/2);ctx.lineTo(x+TILE-2,y+TILE/2);ctx.stroke();
-      }
-      if(cell.dot){
-        ctx.fillStyle=cssVar('--dot');
-        ctx.shadowColor=cssVar('--dot'); ctx.shadowBlur=6;
-        ctx.beginPath();ctx.arc(x+TILE/2,y+TILE/2,2.2,0,7);ctx.fill();
-        ctx.shadowBlur=0;
-      }
-      if(cell.power){
-        const pulse=3.5+Math.sin(frame*0.18)*1.6;
-        ctx.fillStyle=cssVar('--power');
-        ctx.shadowColor=cssVar('--power'); ctx.shadowBlur=14;
-        ctx.beginPath();ctx.arc(x+TILE/2,y+TILE/2,pulse,0,7);ctx.fill();
-        ctx.shadowBlur=0;
+    }
+  });
+}
+
+// ─── DRAWING ────────────────────────────────────────────────────────────────
+
+function drawMaze() {
+  for (let r = 0; r < ROWS; r++) {
+    for (let c = 0; c < COLS; c++) {
+      const cell = maze[r][c];
+      const x = c * CELL;
+      const y = r * CELL;
+
+      if (cell === 1) {
+        // Wall — glowing neon blue blocks
+        ctx.fillStyle = '#001133';
+        ctx.fillRect(x, y, CELL, CELL);
+        ctx.strokeStyle = '#0044AA';
+        ctx.lineWidth = 1.5;
+        ctx.strokeRect(x+1, y+1, CELL-2, CELL-2);
+        // inner glow line
+        ctx.strokeStyle = '#0088FF';
+        ctx.lineWidth = 0.8;
+        ctx.strokeRect(x+3, y+3, CELL-6, CELL-6);
+      } else {
+        ctx.fillStyle = '#050505';
+        ctx.fillRect(x, y, CELL, CELL);
+
+        if (cell === 2) {
+          // Fuel can dot
+          ctx.fillStyle = '#FFB000';
+          ctx.shadowColor = '#FFB000';
+          ctx.shadowBlur = 6;
+          ctx.beginPath();
+          ctx.arc(x + CELL/2, y + CELL/2, 3, 0, Math.PI*2);
+          ctx.fill();
+          ctx.shadowBlur = 0;
+        } else if (cell === 3) {
+          // Power-up (energizer) — flashing fuel barrel
+          const pulse = 0.7 + 0.3 * Math.sin(Date.now() / 200);
+          ctx.fillStyle = `rgba(255,80,0,${pulse})`;
+          ctx.shadowColor = '#FF5500';
+          ctx.shadowBlur = 12;
+          ctx.beginPath();
+          ctx.arc(x + CELL/2, y + CELL/2, 7, 0, Math.PI*2);
+          ctx.fill();
+          ctx.fillStyle = '#FFE000';
+          ctx.beginPath();
+          ctx.arc(x + CELL/2, y + CELL/2, 4, 0, Math.PI*2);
+          ctx.fill();
+          ctx.shadowBlur = 0;
+        }
       }
     }
   }
 }
 
-function drawCar(cx,cy,angle,bodyColor,glowColor,isPolice,flash){
+function drawCar(x, y, dir, color, frame, scared, blinking) {
+  const px = x * CELL + CELL/2;
+  const py = y * CELL + CELL/2;
   ctx.save();
-  ctx.translate(cx,cy);
+  ctx.translate(px, py);
+
+  // Rotate based on direction
+  let angle = 0;
+  if (dir.dx === 1) angle = 0;
+  else if (dir.dx === -1) angle = Math.PI;
+  else if (dir.dy === 1) angle = Math.PI/2;
+  else if (dir.dy === -1) angle = -Math.PI/2;
   ctx.rotate(angle);
-  const w=TILE*0.78, h=TILE*0.5;
-  ctx.shadowColor=glowColor; ctx.shadowBlur=14;
-  // body
-  ctx.fillStyle=bodyColor;
-  roundRect(-w/2,-h/2,w,h,4); ctx.fill();
-  ctx.shadowBlur=0;
-  // cabin
-  ctx.fillStyle='rgba(10,4,32,0.85)';
-  roundRect(-w*0.12,-h*0.34,w*0.42,h*0.68,2); ctx.fill();
-  // headlights (front = +x)
-  ctx.fillStyle=isPolice?'#fff':'#fff7c0';
-  ctx.fillRect(w/2-3,-h/2+2,2,3);
-  ctx.fillRect(w/2-3,h/2-5,2,3);
-  // police light bar
-  if(isPolice){
-    ctx.fillStyle = flash ? '#ff2d6f' : '#2de2ff';
-    ctx.shadowColor = ctx.fillStyle; ctx.shadowBlur=10;
-    roundRect(-w*0.12,-h*0.5,w*0.42,3,1); ctx.fill();
-    ctx.shadowBlur=0;
+
+  if (scared) {
+    // Scared cop: blinking white/blue
+    color = blinking ? '#FFFFFF' : '#8888FF';
   }
+
+  const W2 = 9, H2 = 12;
+
+  // Car body
+  ctx.fillStyle = color;
+  ctx.shadowColor = color;
+  ctx.shadowBlur = 8;
+  ctx.beginPath();
+  ctx.roundRect(-W2, -H2, W2*2, H2*2, 3);
+  ctx.fill();
+  ctx.shadowBlur = 0;
+
+  // Windshield
+  ctx.fillStyle = scared ? '#aaaaff' : '#99DDFF';
+  ctx.fillRect(-W2+2, -H2+2, W2*2-4, 6);
+
+  // Rear window
+  ctx.fillRect(-W2+2, H2-8, W2*2-4, 5);
+
+  // Wheels
+  ctx.fillStyle = '#222';
+  ctx.fillRect(-W2-2, -H2+2, 3, 4);
+  ctx.fillRect(W2-1, -H2+2, 3, 4);
+  ctx.fillRect(-W2-2, H2-6, 3, 4);
+  ctx.fillRect(W2-1, H2-6, 3, 4);
+
+  // Headlights
+  ctx.fillStyle = '#FFFFAA';
+  ctx.fillRect(-W2+1, -H2, 4, 2);
+  ctx.fillRect(W2-5, -H2, 4, 2);
+
   ctx.restore();
 }
-function roundRect(x,y,w,h,r){
-  ctx.beginPath();
-  ctx.moveTo(x+r,y);
-  ctx.arcTo(x+w,y,x+w,y+h,r);
-  ctx.arcTo(x+w,y+h,x,y+h,r);
-  ctx.arcTo(x,y+h,x,y,r);
-  ctx.arcTo(x,y,x+w,y,r);
-  ctx.closePath();
-}
 
-function dirAngle(d){
-  if(d.x>0) return 0;
-  if(d.x<0) return Math.PI;
-  if(d.y>0) return Math.PI/2;
-  if(d.y<0) return -Math.PI/2;
-  return 0;
-}
+function drawPlayer() {
+  const px = player.x * CELL + CELL/2;
+  const py = player.y * CELL + CELL/2;
 
-function drawEntities(){
-  // player sports car
-  const pcx=player.x*TILE+TILE/2, pcy=player.y*TILE+TILE/2;
-  let ang = (player.dir.x||player.dir.y) ? dirAngle(player.dir) : 0;
-  drawCar(pcx,pcy,ang,cssVar('--player'),cssVar('--player-glow'),false,false);
-
-  // police
-  police.forEach(p=>{
-    const cx=p.x*TILE+TILE/2, cy=p.y*TILE+TILE/2;
-    let col=p.color, glow=p.color;
-    if(p.eaten){ col='rgba(45,226,255,0.25)'; glow='rgba(45,226,255,0.4)'; }
-    else if(p.frightened){
-      const blink = powerTimer<120 && Math.floor(frame/8)%2===0;
-      col = blink ? '#fff' : '#1240ff'; glow=col;
+  if (player.dead) {
+    // Explosion animation
+    const t = 1 - player.deadTimer/100;
+    for (let i = 0; i < 8; i++) {
+      const a = (i / 8) * Math.PI * 2;
+      const r = t * 20;
+      ctx.fillStyle = `hsl(${i*45},100%,${50+t*30}%)`;
+      ctx.shadowColor = ctx.fillStyle;
+      ctx.shadowBlur = 10;
+      ctx.beginPath();
+      ctx.arc(px + Math.cos(a)*r, py + Math.sin(a)*r, 3*(1-t)+1, 0, Math.PI*2);
+      ctx.fill();
     }
-    drawCar(cx,cy,dirAngle(p.dir),col,glow,true,Math.floor(frame/6)%2===0);
-  });
-}
-
-/* ---------- LOOP ---------- */
-function loop(){
-  requestAnimationFrame(loop);
-  frame++;
-  if(state==='play'){
-    moveEntity(player,false);
-    eatStuff();
-    police.forEach(p=>{
-      p.timer++;
-      const released = p.timer>p.release;
-      p.atHome = !released;
-      if(!released){
-        // idle bobbing in the pen
-        p.dir = (Math.floor(frame/40)%2===0)?{x:0,y:-1}:{x:0,y:1};
-        if(!canMove(p.x+p.dir.x,p.y+p.dir.y,true)) p.dir={x:-p.dir.x,y:-p.dir.y};
-        moveEntity(p,true);
-      } else {
-        policeAI(p);
-        moveEntity(p, p.eaten);
-      }
-    });
-    if(powerTimer>0){
-      powerTimer--;
-      if(powerTimer===0) police.forEach(p=>p.frightened=false);
-    }
-    checkCollisions();
+    ctx.shadowBlur = 0;
+    return;
   }
-  drawMaze();
-  drawEntities();
+
+  ctx.save();
+  ctx.translate(px, py);
+
+  let angle = 0;
+  if (player.dx === 1) angle = 0;
+  else if (player.dx === -1) angle = Math.PI;
+  else if (player.dy === 1) angle = Math.PI/2;
+  else if (player.dy === -1) angle = -Math.PI/2;
+  ctx.rotate(angle);
+
+  // Sports car — sleek, low, wide
+  const bw = 11, bh = 13;
+
+  // Glow
+  ctx.shadowColor = '#00FF41';
+  ctx.shadowBlur = 14;
+
+  // Body
+  ctx.fillStyle = '#00CC33';
+  ctx.beginPath();
+  ctx.roundRect(-bw, -bh, bw*2, bh*2, 4);
+  ctx.fill();
+
+  // Spoiler
+  ctx.fillStyle = '#009922';
+  ctx.fillRect(-bw, bh-4, bw*2, 3);
+
+  // Windshield
+  ctx.fillStyle = '#AAFFCC';
+  ctx.fillRect(-bw+3, -bh+2, bw*2-6, 7);
+
+  // Cockpit stripe
+  ctx.fillStyle = '#006616';
+  ctx.fillRect(-2, -bh+1, 4, bh*2-2);
+
+  // Headlights
+  ctx.fillStyle = '#FFFFAA';
+  ctx.shadowColor = '#FFFF00';
+  ctx.shadowBlur = 8;
+  ctx.fillRect(-bw+1, -bh, 5, 2);
+  ctx.fillRect(bw-6, -bh, 5, 2);
+
+  // Wheels
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = '#111';
+  ctx.fillRect(-bw-2, -bh+2, 3, 5);
+  ctx.fillRect(bw-1, -bh+2, 3, 5);
+  ctx.fillRect(-bw-2, bh-7, 3, 5);
+  ctx.fillRect(bw-1, bh-7, 3, 5);
+
+  // Taillights
+  ctx.fillStyle = '#FF2200';
+  ctx.fillRect(-bw+1, bh-2, 5, 2);
+  ctx.fillRect(bw-6, bh-2, 5, 2);
+
+  ctx.shadowBlur = 0;
+  ctx.restore();
 }
 
-startBtn.addEventListener('click',startGame);
+function drawCop(cop) {
+  drawCar(cop.x, cop.y, cop, cop.color, cop.frame, cop.scared, cop.scaredBlink);
 
-// initial idle screen
-buildGrid(); resetEntities();
-msg.classList.add('show');
-msgTitle.textContent='Neon Pursuit';
-msgText.textContent='You drive a stolen supercar. Clear every neon node while four cruisers hunt you. Grab a boost to flip the chase and ram them.';
-loop();
+  // Police lights (not scared)
+  if (!cop.scared) {
+    const px = cop.x * CELL + CELL/2;
+    const py = cop.y * CELL + CELL/2;
+    const blink = Math.floor(Date.now()/150) % 2;
+    ctx.shadowBlur = 10;
+    ctx.fillStyle = blink ? '#FF0000' : '#0000FF';
+    ctx.shadowColor = ctx.fillStyle;
+    ctx.beginPath();
+    ctx.arc(px - 4, py - 10, 3, 0, Math.PI*2);
+    ctx.fill();
+    ctx.fillStyle = blink ? '#0000FF' : '#FF0000';
+    ctx.shadowColor = ctx.fillStyle;
+    ctx.beginPath();
+    ctx.arc(px + 4, py - 10, 3, 0, Math.PI*2);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+  }
+}
+
+function drawHUD() {
+  // Top bar
+  ctx.fillStyle = 'rgba(0,0,0,0.75)';
+  ctx.fillRect(0, 0, W, 24);
+
+  ctx.fillStyle = '#FFB000';
+  ctx.font = '8px "Press Start 2P"';
+  ctx.fillText('SCORE', 8, 15);
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fillText(String(score).padStart(6,'0'), 60, 15);
+
+  ctx.fillStyle = '#FFB000';
+  ctx.fillText('HI', 200, 15);
+  ctx.fillStyle = '#FFFFFF';
+  const hi = Math.max(score, parseInt(localStorage.getItem('copchase_hi')||0));
+  ctx.fillText(String(hi).padStart(6,'0'), 220, 15);
+
+  // Lives — draw mini car icons
+  ctx.fillStyle = '#FFB000';
+  ctx.fillText('LIVES', 370, 15);
+  for (let i = 0; i < lives; i++) {
+    ctx.fillStyle = '#00CC33';
+    ctx.fillRect(432 + i*16, 7, 10, 8);
+  }
+
+  // Power mode bar
+  if (powerMode) {
+    const pct = powerTimer / 300;
+    ctx.fillStyle = '#FF5500';
+    ctx.fillRect(8, H - 10, (W-16) * pct, 5);
+    ctx.strokeStyle = '#FF8800';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(8, H-10, W-16, 5);
+  }
+}
+
+function drawScreen(state) {
+  ctx.clearRect(0, 0, W, H);
+
+  if (state === 'title') {
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, W, H);
+
+    // Road stripes
+    for (let i = 0; i < 20; i++) {
+      const y = (i * 50 + (Date.now()/30) % 50) % H;
+      ctx.fillStyle = '#1a1a1a';
+      ctx.fillRect(W/2-2, y, 4, 30);
+    }
+
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#FFB000';
+    ctx.shadowColor = '#FFB000';
+    ctx.shadowBlur = 20;
+    ctx.font = '28px "Press Start 2P"';
+    ctx.fillText('COP CHASE', W/2, 130);
+    ctx.shadowBlur = 0;
+
+    ctx.fillStyle = '#00FF41';
+    ctx.font = '9px "Press Start 2P"';
+    ctx.fillText('COLLECT ALL FUEL CANS', W/2, 175);
+    ctx.fillText('AVOID THE POLICE!', W/2, 200);
+
+    ctx.fillStyle = '#FF4444';
+    ctx.font = '8px "Press Start 2P"';
+    ctx.fillText('★ POWER-UPS TURN THE TABLES ★', W/2, 235);
+    ctx.fillText('POLICE BECOME FRIGHTENED!', W/2, 255);
+
+    // blinking start
+    if (Math.floor(Date.now()/500)%2 === 0) {
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = '10px "Press Start 2P"';
+      ctx.fillText('PRESS START OR SPACE', W/2, 340);
+    }
+
+    ctx.fillStyle = '#555';
+    ctx.font = '7px "Press Start 2P"';
+    ctx.fillText('USE ARROW KEYS OR WASD', W/2, 390);
+    ctx.fillText('TO STEER YOUR CAR', W/2, 408);
+
+    ctx.textAlign = 'left';
+    return;
+  }
+
+  if (state === 'playing' || state === 'paused') {
+    drawMaze();
+    cops.forEach(drawCop);
+    drawPlayer();
+    drawHUD();
+
+    if (state === 'paused') {
+      ctx.fillStyle = 'rgba(0,0,0,0.6)';
+      ctx.fillRect(0, 0, W, H);
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#FFB000';
+      ctx.font = '18px "Press Start 2P"';
+      ctx.shadowColor = '#FFB000'; ctx.shadowBlur = 20;
+      ctx.fillText('PAUSED', W/2, H/2);
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = '#888';
+      ctx.font = '8px "Press Start 2P"';
+      ctx.fillText('PRESS P TO RESUME', W/2, H/2 + 30);
+      ctx.textAlign = 'left';
+    }
+    return;
+  }
+
+  if (state === 'dead') {
+    drawMaze();
+    cops.forEach(drawCop);
+    drawPlayer();
+    drawHUD();
+    return;
+  }
+
+  if (state === 'gameover') {
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, W, H);
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#FF2222';
+    ctx.shadowColor = '#FF0000'; ctx.shadowBlur = 30;
+    ctx.font = '22px "Press Start 2P"';
+    ctx.fillText('BUSTED!', W/2, 150);
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = '#FFB000';
+    ctx.font = '10px "Press Start 2P"';
+    ctx.fillText('FINAL SCORE', W/2, 210);
+    ctx.fillStyle = '#FFF';
+    ctx.font = '18px "Press Start 2P"';
+    ctx.fillText(String(score).padStart(6,'0'), W/2, 240);
+    const hi = Math.max(score, parseInt(localStorage.getItem('copchase_hi')||0));
+    ctx.fillStyle = '#00FF41';
+    ctx.font = '8px "Press Start 2P"';
+    ctx.fillText('HI SCORE: ' + String(hi).padStart(6,'0'), W/2, 270);
+    if (Math.floor(Date.now()/500)%2===0) {
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = '10px "Press Start 2P"';
+      ctx.fillText('PRESS START', W/2, 340);
+    }
+    ctx.textAlign = 'left';
+    return;
+  }
+
+  if (state === 'win') {
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, W, H);
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#00FF41';
+    ctx.shadowColor = '#00FF41'; ctx.shadowBlur = 30;
+    ctx.font = '18px "Press Start 2P"';
+    ctx.fillText('YOU ESCAPED!', W/2, 150);
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = '#FFB000';
+    ctx.font = '10px "Press Start 2P"';
+    ctx.fillText('SCORE', W/2, 210);
+    ctx.fillStyle = '#FFF';
+    ctx.font = '18px "Press Start 2P"';
+    ctx.fillText(String(score).padStart(6,'0'), W/2, 240);
+    if (Math.floor(Date.now()/500)%2===0) {
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = '10px "Press Start 2P"';
+      ctx.fillText('PRESS START - NEXT LEVEL', W/2, 320);
+    }
+    ctx.textAlign = 'left';
+  }
+}
+
+// ─── GAME LOOP ───────────────────────────────────────────────────────────────
+
+let tickCount = 0;
+function gameLoop(ts) {
+  animFrame = requestAnimationFrame(gameLoop);
+  tickCount++;
+
+  if (gameState === 'title' || gameState === 'gameover' || gameState === 'win') {
+    drawScreen(gameState);
+    return;
+  }
+
+  if (gameState === 'paused') {
+    drawScreen('paused');
+    return;
+  }
+
+  if (gameState === 'dead') {
+    player.deadTimer--;
+    drawScreen('dead');
+    if (player.deadTimer <= 0) {
+      lives--;
+      if (lives <= 0) {
+        const hi = Math.max(score, parseInt(localStorage.getItem('copchase_hi')||0));
+        localStorage.setItem('copchase_hi', hi);
+        gameState = 'gameover';
+      } else {
+        resetPositions();
+        gameState = 'playing';
+      }
+    }
+    return;
+  }
+
+  if (gameState === 'playing') {
+    // player moves every 8 ticks
+    if (tickCount % 8 === 0) {
+      movePlayer();
+    }
+    moveCops();
+    checkCollisions();
+    if (powerMode) {
+      powerTimer--;
+      if (powerTimer <= 0) {
+        powerMode = false;
+        cops.forEach(c => { c.scared = false; c.scaredBlink = false; });
+      }
+    }
+    playSiren();
+    drawScreen('playing');
+  }
+}
+
+// ─── INPUT ───────────────────────────────────────────────────────────────────
+
+document.addEventListener('keydown', e => {
+  if (['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','a','d','w','s',' '].includes(e.key)) {
+    e.preventDefault();
+  }
+
+  if (gameState === 'title' || gameState === 'gameover') {
+    if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowUp') {
+      startGame(); return;
+    }
+  }
+  if (gameState === 'win') {
+    if (e.key === 'Enter' || e.key === ' ') { nextLevel(); return; }
+  }
+  if (e.key === 'p' || e.key === 'P') { pauseGame(); return; }
+
+  if (gameState !== 'playing') return;
+
+  if (e.key === 'ArrowLeft' || e.key === 'a') { player.nextDx = -1; player.nextDy = 0; }
+  if (e.key === 'ArrowRight' || e.key === 'd') { player.nextDx = 1; player.nextDy = 0; }
+  if (e.key === 'ArrowUp' || e.key === 'w') { player.nextDx = 0; player.nextDy = -1; }
+  if (e.key === 'ArrowDown' || e.key === 's') { player.nextDx = 0; player.nextDy = 1; }
+});
+
+// Touch / swipe support
+let touchStartX = 0, touchStartY = 0;
+canvas.addEventListener('touchstart', e => {
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
+  e.preventDefault();
+}, {passive:false});
+canvas.addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  const dy = e.changedTouches[0].clientY - touchStartY;
+  if (Math.abs(dx) > Math.abs(dy)) {
+    if (dx > 20) { player.nextDx=1; player.nextDy=0; }
+    else if (dx < -20) { player.nextDx=-1; player.nextDy=0; }
+  } else {
+    if (dy > 20) { player.nextDx=0; player.nextDy=1; }
+    else if (dy < -20) { player.nextDx=0; player.nextDy=-1; }
+  }
+  if (gameState === 'title' || gameState === 'gameover') startGame();
+  e.preventDefault();
+}, {passive:false});
+
+function startGame() {
+  if (animFrame) cancelAnimationFrame(animFrame);
+  initGame();
+  tickCount = 0;
+  animFrame = requestAnimationFrame(gameLoop);
+}
+
+function nextLevel() {
+  level++;
+  maze = MAZE_TEMPLATE.map(r => [...r]);
+  dotCount = 0;
+  maze.forEach(row => row.forEach(c => { if(c===2||c===3) dotCount++; }));
+  spawnEntities();
+  gameState = 'playing';
+}
+
+function pauseGame() {
+  if (gameState === 'playing') gameState = 'paused';
+  else if (gameState === 'paused') gameState = 'playing';
+}
+
+// ─── BOOT ────────────────────────────────────────────────────────────────────
+
+gameState = 'title';
+animFrame = requestAnimationFrame(gameLoop);
 </script>
 </body>
 </html>

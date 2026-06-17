@@ -1,0 +1,44 @@
+.common {
+  background-color: rgb(141, 184, 230);
+  border: 2px solid rgb(236, 111, 111);
+  color:black;
+  position: absolute;
+  font-family:Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+}
+.header {
+  top: 5px;
+  left: 15px;
+  right: 25px;
+  height: 100px;
+}
+
+.left {
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  top: 115px;
+  left: 15px;
+  width: 200px;
+  bottom: 40px;
+}
+.right {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+  top: 115px;
+  right: 25px;
+  width: 100px;
+  bottom: 40px;
+  color:darkorange;
+}
+
+.main {
+  top: 115px;
+  left: 230px;
+  right: 140px;
+  bottom: 40px;
+  overflow: hidden;
+}
+.footer {
+  bottom: 5px;
+  height: 25px;
+  left: 15px;
+  right: 25px;
+  position: fixed;}
+  
